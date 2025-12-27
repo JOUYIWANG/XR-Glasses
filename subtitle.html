@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AR Subtitle HUD</title>
+
+  <style>
+    :root {
+      --bg: rgba(0, 0, 0, 0.85);   /* 黑底 */
+      --text: #00ffcc;           /* 字色 */
+      --font-size: 28px;
+      --line-height: 1.4;
+      --padding: 16px;
+    }
+
+    body {
+      margin: 0;
+      background: transparent;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial;
+    }
+
+    #hud {
+      position: fixed;
+      bottom: 8%;
+      left: 50%;
+      transform: translateX(-50%);
+      max-width: 92%;
+      padding: var(--padding);
+      background: var(--bg);
+      color: var(--text);
+      font-size: var(--font-size);
+      line-height: var(--line-height);
+      border-radius: 12px;
+      text-align: center;
+      word-break: break-word;
+    }
+
+    /* 隱藏狀態 */
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="hud" class="hidden">字幕初始化中…</div>
+
+  <script>
+    const hud = document.getElementById("hud");
+
+    /* ===== 狀態 ===== */
+    let enabled = true;
+
+    /* ===== API：更新字幕（流式可重複呼叫） ===== */
+    function updateSubtitle(text) {
+      if (!enabled || !text) return;
+      hud.textContent = text;
+      hud.classList.remove("hidden");
+    }
+
+    /* ===== API：清空字幕 ===== */
+    function clearSubtitle() {
+      hud.textContent = "";
+      hud.classList.add("hidden");
+    }
+
+    /* ===== API：模式切換 ===== */
+    function setMode(mode) {
+      if (mode === "off") {
+        enabled = false;
+        clearSubtitle();
+      } else {
+        enabled = true;
+      }
+    }
+
+    /* ===== API：外部接入點（之後接翻譯流） ===== */
+    window.ARSubtitle = {
+      update: updateSubtitle,
+      clear: clearSubtitle,
+      mode: setMode
+    };
+
+    /* ===== 測試用（之後可刪） ===== */
+    const demo = [
+      "我現在開始講話",
+      "字幕會即時更新",
+      "不用等一句講完",
+      "這就是 AR 即時字幕"
+    ];
+
+    let i = 0;
+    setInterval(() => {
+      if (i < demo.length) {
+        updateSubtitle(demo[i]);
+        i++;
+      }
+    }, 1200);
+  </script>
+</body>
+</html>
